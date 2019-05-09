@@ -1,0 +1,35 @@
+---
+title: "TweetViz"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#library
+library(tm)
+library(wordcloud)
+```
+#get search results
+```{r}
+text<-searchTwitter('pikachu', lang="en", n=50, resultType="recent")
+str(text)
+text2<-sapply(text,function(x) x$getText())
+str(text2)
+```
+#convert into corpus
+```{r}
+p_corpus<-Corpus(VextorSource(text2))
+p_corpus
+inspect(p_corpus[1])
+```
+#clean up contents
+```{r}
+p_clean<-tm_map(p_corpus, removePunctuation)
+p_clean<-tm_map(p_clean,content_transformer(tolower))
+p_clean<-tm_map(p_clean,removeWord, stopword("english"))
+p_clean<-tm_map(p_clean, removeNumbers)
+p_clean<-tm_map(p_clean,stripWhitespace)
+
+#visualization
+wordcloud(p_clean, random.order=F, scale = c(3, 0.5))
+```
+
